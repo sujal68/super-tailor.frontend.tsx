@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Eye, EyeOff, RotateCcw, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
+import CityDropdown from './CityDropdown';
+import CustomDropdown from './CustomDropdown';
 
 interface TailorShop {
   id: number;
@@ -182,24 +184,25 @@ const EditTailorModal: React.FC<EditTailorModalProps> = ({ isOpen, onClose, tail
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className={labelStyles}>City</label>
-                      <select name="city" value={formData.city} onChange={handleChange} className={`${inputStyles} appearance-none cursor-pointer`}>
-                        <option>Mumbai</option>
-                        <option>Delhi</option>
-                        <option>Bangalore</option>
-                        <option>Pune</option>
-                        <option>Chennai</option>
-                        <option>Hyderabad</option>
-                        <option>Kolkata</option>
-                        <option>Ahmedabad</option>
-                      </select>
+                      <CityDropdown
+                        value={formData.city}
+                        onChange={(value) => setFormData({ ...formData, city: value })}
+                        placeholder="Select City"
+                        searchable={true}
+                      />
                     </div>
                     <div>
                       <label className={labelStyles}>Status</label>
-                      <select name="status" value={formData.status} onChange={handleChange} className={`${inputStyles} appearance-none cursor-pointer font-medium ${formData.status === 'active' ? 'text-emerald-700' : formData.status === 'pending' ? 'text-amber-700' : 'text-red-700'}`}>
-                        <option value="active">Active</option>
-                        <option value="pending">Pending</option>
-                        <option value="blocked">Blocked</option>
-                      </select>
+                      <CustomDropdown
+                        options={[
+                          { value: 'active', label: 'Active' },
+                          { value: 'pending', label: 'Pending' },
+                          { value: 'blocked', label: 'Blocked' },
+                        ]}
+                        value={formData.status}
+                        onChange={(value) => setFormData({ ...formData, status: value })}
+                        placeholder="Select Status"
+                      />
                     </div>
                   </div>
                 </div>

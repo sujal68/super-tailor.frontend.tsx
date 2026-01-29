@@ -198,11 +198,10 @@ function FilterDropdown({ filter, setFilter }: { filter: string; setFilter: (f: 
                         <div
                             key={item}
                             onClick={() => { setFilter(item); setOpen(false); }}
-                            className={`px-3 py-2 text-[11px] rounded-md cursor-pointer transition-all ${
-                                filter === item
+                            className={`px-3 py-2 text-[11px] rounded-md cursor-pointer transition-all ${filter === item
                                     ? 'bg-[#6f5b3e] text-white'
                                     : 'text-[#6f5b3e] hover:bg-white/60'
-                            }`}
+                                }`}
                         >
                             {item}
                         </div>

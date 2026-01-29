@@ -2,7 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
 import CustomDropdown from '../components/CustomDropdown';
+import CityDropdown from '../components/CityDropdown';
+import CustomerDetailSidebar from '../components/CustomerDetailSidebar';
 import EditCustomerModal from '../components/EditCustomerModal';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import PageTitle from '../components/PageTitle';
+import { getCityOptions } from '../utils/cities';
 
 interface Customer {
   id: number;
@@ -24,8 +29,12 @@ export default function Customers(): React.JSX.Element {
   const [cityFilter, setCityFilter] = useState('all');
   const [tailorFilter, setTailorFilter] = useState('all');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null);
   const [allCustomers, setAllCustomers] = useState<Customer[]>([
     { id: 1, name: 'Rahul Sharma', email: 'rahul@email.com', phone: '9876543210', city: 'Mumbai', tailor: 'Royal Tailors', orders: 12, totalSpent: 45000, status: 'active', joinDate: '2024-01-15', img: 'https://i.pravatar.cc/150?u=c1' },
     { id: 2, name: 'Priya Patel', email: 'priya@email.com', phone: '9876543211', city: 'Delhi', tailor: 'Elite Stitch', orders: 8, totalSpent: 32000, status: 'active', joinDate: '2024-02-20', img: 'https://i.pravatar.cc/150?u=c2' },
@@ -34,6 +43,17 @@ export default function Customers(): React.JSX.Element {
     { id: 5, name: 'Vikram Singh', email: 'vikram@email.com', phone: '9876543214', city: 'Chennai', tailor: 'Prime Cut', orders: 9, totalSpent: 38000, status: 'active', joinDate: '2024-03-01', img: 'https://i.pravatar.cc/150?u=c5' },
     { id: 6, name: 'Anita Desai', email: 'anita@email.com', phone: '9876543215', city: 'Hyderabad', tailor: 'Modern Tailors', orders: 3, totalSpent: 12000, status: 'pending', joinDate: '2024-03-15', img: 'https://i.pravatar.cc/150?u=c6' }
   ]);
+
+  const handleViewDetails = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsSidebarOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+    document.body.style.overflow = 'auto';
+  };
 
   const handleEditCustomer = (customer: Customer) => {
     setEditingCustomer(customer);
@@ -46,6 +66,16 @@ export default function Customers(): React.JSX.Element {
     setEditingCustomer(null);
   };
 
+  const handleDeleteCustomer = (customer: Customer) => {
+    setDeletingCustomer(customer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingCustomer(null);
+  };
+
   const filteredCustomers = useMemo(() => {
     return allCustomers.filter(customer => {
       const matchesSearch = searchTerm === '' || 
@@ -56,7 +86,7 @@ export default function Customers(): React.JSX.Element {
         customer.tailor.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
-      const matchesCity = cityFilter === 'all' || customer.city === cityFilter;
+      const matchesCity = cityFilter === 'all' || customer.city.toLowerCase() === cityFilter.toLowerCase();
       const matchesTailor = tailorFilter === 'all' || customer.tailor === tailorFilter;
       
       return matchesSearch && matchesStatus && matchesCity && matchesTailor;
@@ -72,10 +102,7 @@ export default function Customers(): React.JSX.Element {
     ...statuses.map(status => ({ value: status, label: status.charAt(0).toUpperCase() + status.slice(1) }))
   ];
 
-  const cityOptions = [
-    { value: 'all', label: 'All Cities' },
-    ...cities.map(city => ({ value: city, label: city }))
-  ];
+  const cityOptions = getCityOptions();
 
   const tailorOptions = [
     { value: 'all', label: 'All Tailors' },
@@ -91,12 +118,10 @@ export default function Customers(): React.JSX.Element {
     >
       <div className="flex flex-col lg:flex-row justify-between items-start mb-[22px] gap-5">
         <div>
-          <h1 className="text-[28px] sm:text-[32px] font-bold m-0 text-[#6f5b3e] font-sans">
-            Customers
-          </h1>
-          <p className="m-0 mt-1.5 text-sm text-[#8b7a63] font-sans">
-            Manage all customer accounts and orders
-          </p>
+          <PageTitle 
+            title="Customer Management" 
+            subtitle="Manage all customer accounts and orders"
+          />
           <p className="m-0 mt-2 text-xs text-[#8b7a63] opacity-70 font-sans">
             Showing: {filteredCustomers.length} of {allCustomers.length} customers
           </p>
@@ -127,11 +152,12 @@ export default function Customers(): React.JSX.Element {
               placeholder="All Status"
             />
             
-            <CustomDropdown
-              options={cityOptions}
+            <CityDropdown
               value={cityFilter}
               onChange={setCityFilter}
               placeholder="All Cities"
+              searchable={true}
+              includeAll={true}
             />
             
             <CustomDropdown
@@ -206,9 +232,9 @@ export default function Customers(): React.JSX.Element {
                     </td>
                     <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">
                       <div className="flex gap-2 sm:gap-2.5 text-[#8a7b6a] opacity-60 group-hover:opacity-100 transition-opacity">
-                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 cursor-pointer hover:text-[#6f5b3e]" />
+                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 cursor-pointer hover:text-[#6f5b3e]" onClick={() => handleViewDetails(customer)} />
                         <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4 cursor-pointer hover:text-[#6f5b3e]" onClick={() => handleEditCustomer(customer)} />
-                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 cursor-pointer hover:text-[#6f5b3e]" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 cursor-pointer hover:text-[#6f5b3e]" onClick={() => handleDeleteCustomer(customer)} />
                       </div>
                     </td>
                   </tr>
@@ -219,11 +245,25 @@ export default function Customers(): React.JSX.Element {
         </div>
       </div>
       
+      <CustomerDetailSidebar
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        customer={selectedCustomer}
+      />
+      
       <EditCustomerModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         customer={editingCustomer}
         onSave={handleSaveCustomer}
+      />
+      
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Customer"
+        message={`Are you sure you want to delete ${deletingCustomer?.name}? This action cannot be undone.`}
       />
     </motion.div>
   );

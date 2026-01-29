@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, RotateCcw, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
+import CityDropdown from './CityDropdown';
+import CustomDropdown from './CustomDropdown';
 
 interface Customer {
   id: number;
@@ -41,7 +43,7 @@ const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ isOpen, onClose, 
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
-        city: customer.city,
+        city: customer.city.toLowerCase(),
         tailor: customer.tailor,
         status: customer.status,
         address: `Address, ${customer.city}`,
@@ -78,7 +80,7 @@ const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ isOpen, onClose, 
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
-        city: customer.city,
+        city: customer.city.toLowerCase(),
         tailor: customer.tailor,
         status: customer.status,
         address: `Address, ${customer.city}`,
@@ -99,7 +101,7 @@ const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ isOpen, onClose, 
         exit={{ opacity: 0, scale: 0.95 }}
         className="w-full max-w-4xl max-h-[90vh] overflow-y-auto"
       >
-        <div className="backdrop-blur-2xl bg-white/70 border-2 border-dashed border-[#6f5b3e]/25 rounded-2xl overflow-hidden relative">
+        <div className="backdrop-blur-2xl bg-white border-2 border-dashed border-[#6f5b3e]/25 rounded-2xl overflow-hidden relative">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 text-[#8b7a63] hover:text-[#6f5b3e] transition-colors z-10"
@@ -167,39 +169,45 @@ const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ isOpen, onClose, 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className={labelStyles}>City</label>
-                      <select name="city" value={formData.city} onChange={handleChange} className={`${inputStyles} appearance-none cursor-pointer`}>
-                        <option>Mumbai</option>
-                        <option>Delhi</option>
-                        <option>Bangalore</option>
-                        <option>Pune</option>
-                        <option>Chennai</option>
-                        <option>Hyderabad</option>
-                        <option>Kolkata</option>
-                        <option>Ahmedabad</option>
-                      </select>
+                      <CityDropdown
+                        value={formData.city}
+                        onChange={(value) => setFormData({ ...formData, city: value })}
+                        placeholder="Select City"
+                        searchable={true}
+                      />
                     </div>
                     <div>
                       <label className={labelStyles}>Assigned Tailor</label>
-                      <select name="tailor" value={formData.tailor} onChange={handleChange} className={`${inputStyles} appearance-none cursor-pointer`}>
-                        <option>Royal Tailors</option>
-                        <option>Elite Stitch</option>
-                        <option>Urban Fit</option>
-                        <option>Fashion Hub</option>
-                        <option>Prime Cut</option>
-                        <option>Modern Tailors</option>
-                        <option>Classic Stitching</option>
-                        <option>Luxury Fabrics</option>
-                      </select>
+                      <CustomDropdown
+                        options={[
+                          { value: 'Royal Tailors', label: 'Royal Tailors' },
+                          { value: 'Elite Stitch', label: 'Elite Stitch' },
+                          { value: 'Urban Fit', label: 'Urban Fit' },
+                          { value: 'Fashion Hub', label: 'Fashion Hub' },
+                          { value: 'Prime Cut', label: 'Prime Cut' },
+                          { value: 'Modern Tailors', label: 'Modern Tailors' },
+                          { value: 'Classic Stitching', label: 'Classic Stitching' },
+                          { value: 'Luxury Fabrics', label: 'Luxury Fabrics' }
+                        ]}
+                        value={formData.tailor}
+                        onChange={(value) => setFormData({ ...formData, tailor: value })}
+                        placeholder="Select Tailor"
+                      />
                     </div>
                   </div>
 
                   <div>
                     <label className={labelStyles}>Account Status</label>
-                    <select name="status" value={formData.status} onChange={handleChange} className={`${inputStyles} appearance-none cursor-pointer font-medium ${formData.status === 'active' ? 'text-emerald-700' : formData.status === 'pending' ? 'text-amber-700' : 'text-red-700'}`}>
-                      <option value="active">Active</option>
-                      <option value="pending">Pending</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
+                    <CustomDropdown
+                      options={[
+                        { value: 'active', label: 'Active' },
+                        { value: 'pending', label: 'Pending' },
+                        { value: 'inactive', label: 'Inactive' }
+                      ]}
+                      value={formData.status}
+                      onChange={(value) => setFormData({ ...formData, status: value })}
+                      placeholder="Select Status"
+                    />
                   </div>
 
                   <div className="bg-[#6f5b3e]/5 rounded-xl p-4 space-y-2">

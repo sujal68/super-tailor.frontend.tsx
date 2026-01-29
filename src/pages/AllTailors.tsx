@@ -3,7 +3,11 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react';
 import TailorDetailSidebar from '../components/TailorDetailSidebar';
 import CustomDropdown from '../components/CustomDropdown';
+import CityDropdown from '../components/CityDropdown';
 import EditTailorModal from '../components/EditTailorModal';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import PageTitle from '../components/PageTitle';
+import { getCityOptions } from '../utils/cities';
 
 interface TailorShop {
   id: number;
@@ -27,6 +31,8 @@ const AllTailors: React.FC = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTailor, setEditingTailor] = useState<TailorShop | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingTailor, setDeletingTailor] = useState<TailorShop | null>(null);
   const [allTailors, setAllTailors] = useState<TailorShop[]>([
     { id: 1, name: 'Royal Tailors', owner: 'Arjun Singh', city: 'Mumbai', customers: 245, orders: 520, revenue: 650000, status: 'active', img: 'https://i.pravatar.cc/150?u=1' },
     { id: 2, name: 'Elite Stitch', owner: 'Maie Barnan', city: 'Delhi', customers: 189, orders: 423, status: 'active', revenue: 528750, img: 'https://i.pravatar.cc/150?u=2' },
@@ -60,16 +66,26 @@ const AllTailors: React.FC = () => {
     setEditingTailor(null);
   };
 
+  const handleDeleteTailor = (tailor: TailorShop) => {
+    setDeletingTailor(tailor);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingTailor(null);
+  };
+
   const filteredTailors = useMemo(() => {
     return allTailors.filter(tailor => {
-      const matchesSearch = searchTerm === '' || 
+      const matchesSearch = searchTerm === '' ||
         tailor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tailor.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tailor.city.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesStatus = statusFilter === 'all' || tailor.status === statusFilter;
-      const matchesCity = cityFilter === 'all' || tailor.city === cityFilter;
-      
+      const matchesCity = cityFilter === 'all' || tailor.city.toLowerCase() === cityFilter.toLowerCase();
+
       return matchesSearch && matchesStatus && matchesCity;
     });
   }, [searchTerm, statusFilter, cityFilter, allTailors]);
@@ -82,33 +98,38 @@ const AllTailors: React.FC = () => {
     ...statuses.map(status => ({ value: status, label: status.charAt(0).toUpperCase() + status.slice(1) }))
   ];
 
-  const cityOptions = [
-    { value: 'all', label: 'All Cities' },
-    ...cities.map(city => ({ value: city, label: city }))
-  ];
+  const cityOptions = getCityOptions();
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className="px-4 sm:px-6 pb-6 pt-1"
     >
-      <div className="flex flex-col lg:flex-row justify-between items-start mb-[22px] gap-5">
-        <div>
-          <h1 className="text-[28px] sm:text-[32px] font-bold m-0 text-[#6f5b3e] font-sans">
-            All Tailors
-          </h1>
-          <p className="m-0 mt-1.5 text-sm text-[#8b7a63] font-sans">
-            Complete list of registered tailor shops
-          </p>
-          <p className="m-0 mt-2 text-xs text-[#8b7a63] opacity-70 font-sans">
-            Showing: {filteredTailors.length} of {allTailors.length} tailors
-          </p>
-        </div>
-        
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="flex flex-col lg:flex-row justify-between items-start mb-[22px] gap-5"
+      >
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <PageTitle 
+            title="Registered Tailors"
+          />
+        </motion.div>
+
         {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4"
+        >
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b7a63] w-4 h-4 z-10" />
             <input
@@ -118,12 +139,11 @@ const AllTailors: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className={`pl-10 pr-4 py-2.5 bg-white/60 border border-[#e3dbd0] rounded-xl text-sm text-[#6f5b3e] placeholder-[#8b7a63]/60 focus:outline-none focus:ring-2 focus:ring-[#6f5b3e]/30 focus:border-[#6f5b3e] transition-all duration-300 ${
-                isSearchFocused ? 'w-80 sm:w-96' : 'w-64 sm:w-80'
-              }`}
+              className={`pl-10 pr-4 py-2.5 bg-white/60 border-2 border-[#d6c8b8] rounded-xl text-sm text-[#6f5b3e] placeholder-[#8b7a63]/60 focus:outline-none focus:ring-2 focus:ring-[#6f5b3e]/30 focus:border-[#6f5b3e] transition-all duration-300 ${isSearchFocused ? 'w-80 sm:w-96' : 'w-64 sm:w-80'
+                }`}
             />
           </div>
-          
+
           <div className="flex gap-2">
             <CustomDropdown
               options={statusOptions}
@@ -131,21 +151,49 @@ const AllTailors: React.FC = () => {
               onChange={setStatusFilter}
               placeholder="All Status"
             />
-            
-            <CustomDropdown
-              options={cityOptions}
+
+            <CityDropdown
               value={cityFilter}
               onChange={setCityFilter}
               placeholder="All Cities"
+              searchable={true}
+              includeAll={true}
             />
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <div className="font-['Inter',sans-serif] text-[#4e463e]">
-        <div className="main-container max-w-[1154px] [body.sidebar-collapsed_&]:max-w-[1334px] mx-auto bg-gradient-to-b from-white/60 to-white/30 rounded-[18px] p-[18px] sm:p-[26px] border border-white transition-[max-width] duration-350 ease-in-out">
-          
-          <div className="overflow-x-auto max-sm:overflow-x-scroll">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="font-['Inter',sans-serif] text-[#4e463e]"
+      >
+        <motion.div 
+          className="main-container max-w-[1154px] [body.sidebar-collapsed_&]:max-w-[1334px] mx-auto bg-gradient-to-b from-white/60 to-white/30 rounded-[18px] p-[18px] sm:p-[26px] border-2 border-dashed border-[#d6c8b8] transition-[max-width] duration-350 ease-in-out hover:shadow-lg smooth-transition"
+          whileHover={{ 
+            borderColor: 'rgba(111, 91, 62, 0.4)',
+            backgroundColor: 'rgba(255, 255, 255, 0.4)'
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mb-4"
+          >
+            {/* <h3 className="text-lg font-semibold text-[#6f5b3e] mb-2">All Tailors</h3> */}
+            <p className="text-sm text-[#8b7a63] mb-1">Complete list of registered tailor shops</p>
+            <p className="text-xs text-[#8b7a63] opacity-70">Showing: {filteredTailors.length} of {allTailors.length} tailors</p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="overflow-x-auto max-sm:overflow-x-scroll"
+          >
             <table className="w-full border-collapse min-w-[800px]">
               <thead>
                 <tr className="text-left">
@@ -166,7 +214,7 @@ const AllTailors: React.FC = () => {
                       <div className="flex flex-col items-center gap-2">
                         <Filter className="w-8 h-8 opacity-50" />
                         <p>No tailors found matching your criteria</p>
-                        <button 
+                        <button
                           onClick={() => { setSearchTerm(''); setStatusFilter('all'); setCityFilter('all'); }}
                           className="text-sm text-[#6f5b3e] hover:underline"
                         >
@@ -176,30 +224,45 @@ const AllTailors: React.FC = () => {
                     </td>
                   </tr>
                 ) : filteredTailors.map((tailor: TailorShop) => (
-                  <tr key={tailor.id} className="bg-transparent transition-colors duration-150 hover:bg-white/55 group">
+                  <tr key={tailor.id} className="bg-transparent transition-all duration-300 hover:bg-white/55 group hover:shadow-sm">
                     <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">
                       <div className="flex items-center gap-2 sm:gap-2.5 font-medium">
-                        <img src={tailor.img} className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full" alt="" />
-                        <span className="truncate">{tailor.name}</span>
+                        <div className="relative">
+                          <img
+                            src={tailor.img}
+                            className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full ring-2 ring-white group-hover:ring-[#6f5b3e] transition-all duration-300"
+                            alt=""
+                          />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <span className="truncate group-hover:text-[#6f5b3e] transition-colors">{tailor.name}</span>
                       </div>
                     </td>
-                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">{tailor.owner}</td>
-                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0] hidden md:table-cell">{tailor.city}</td>
-                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">{tailor.customers}</td>
-                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">{tailor.orders}</td>
-                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">₹{tailor.revenue.toLocaleString()}</td>
+                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0] group-hover:text-[#6f5b3e] transition-colors">{tailor.owner}</td>
+                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0] hidden md:table-cell group-hover:text-[#6f5b3e] transition-colors">{tailor.city}</td>
+                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0] group-hover:text-[#6f5b3e] transition-colors">{tailor.customers}</td>
+                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0] group-hover:text-[#6f5b3e] transition-colors">{tailor.orders}</td>
+                    <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0] group-hover:text-[#6f5b3e] transition-colors">₹{tailor.revenue.toLocaleString()}</td>
                     <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">
-                      <span className={`px-1.5 sm:px-2 py-[3px] rounded-md text-[0.65rem] sm:text-[0.7rem] font-semibold capitalize border border-dashed whitespace-nowrap ${
-                        tailor.status === 'active' ? 'bg-[#e7f3ed] text-[#2f6f53] border-[#2f6f53]/30' : 
-                        tailor.status === 'pending' ? 'bg-[#fff2db] text-[#b88924] border-[#b88924]/30' : 
-                        'bg-[#fdeaea] text-[#a64444] border-[#a64444]/30'
-                      }`}>
+                      <span className={`px-1.5 sm:px-2 py-[3px] rounded-md text-[0.65rem] sm:text-[0.7rem] font-semibold capitalize border border-dashed whitespace-nowrap transition-all duration-300 group-hover:scale-105 ${tailor.status === 'active' ? 'bg-[#e7f3ed] text-[#2f6f53] border-[#2f6f53]/30 group-hover:shadow-md' :
+                          tailor.status === 'pending' ? 'bg-[#fff2db] text-[#b88924] border-[#b88924]/30 group-hover:shadow-md' :
+                            'bg-[#fdeaea] text-[#a64444] border-[#a64444]/30 group-hover:shadow-md'
+                        }`}>
                         {tailor.status}
                       </span>
                     </td>
                     <td className="px-2 sm:px-3.5 py-2 sm:py-3 text-[0.78rem] sm:text-[0.85rem] border-b border-[#e3dbd0]">
                       <div className="flex gap-2 sm:gap-2.5 text-[#8a7b6a] opacity-60 group-hover:opacity-100 transition-opacity">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="cursor-pointer sm:w-4 sm:h-4 hover:stroke-[#6f5b3e]" onClick={() => handleViewDetails(tailor)}>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="cursor-pointer sm:w-4 sm:h-4 hover:stroke-[#6f5b3e] hover:scale-110 transition-all duration-200"
+                          onClick={() => handleViewDetails(tailor)}
+                        >
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
                             <animate attributeName="stroke-dasharray" values="0 50;50 0" dur="2s" repeatCount="indefinite" />
                           </path>
@@ -207,7 +270,16 @@ const AllTailors: React.FC = () => {
                             <animate attributeName="r" values="3;3.5;3" dur="1.5s" repeatCount="indefinite" />
                           </circle>
                         </svg>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="cursor-pointer sm:w-[14px] sm:h-[14px] hover:stroke-[#6f5b3e]" onClick={() => handleEditTailor(tailor)}>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="cursor-pointer sm:w-[14px] sm:h-[14px] hover:stroke-[#6f5b3e] hover:scale-110 transition-all duration-200"
+                          onClick={() => handleEditTailor(tailor)}
+                        >
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7">
                             <animate attributeName="stroke-dasharray" values="0 60;60 0" dur="2.5s" repeatCount="indefinite" />
                           </path>
@@ -215,7 +287,16 @@ const AllTailors: React.FC = () => {
                             <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
                           </path>
                         </svg>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="cursor-pointer sm:w-[14px] sm:h-[14px] hover:stroke-[#6f5b3e]">
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="cursor-pointer sm:w-[14px] sm:h-[14px] hover:stroke-red-500 hover:scale-110 transition-all duration-200"
+                          onClick={() => handleDeleteTailor(tailor)}
+                        >
                           <polyline points="3 6 5 6 21 6">
                             <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
                           </polyline>
@@ -229,31 +310,72 @@ const AllTailors: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+          </motion.div>
 
-          <div className="mt-[18px] flex justify-center items-center gap-3 text-[0.8rem] text-[#8f8579]">
-            <ChevronLeft size={16} className="cursor-pointer hover:text-[#6f5b3e]" />
-            <span className="px-2 py-1 cursor-pointer bg-[#6f5b3e] rounded-md text-white font-semibold">1</span>
-            <span className="px-2 py-1 cursor-pointer hover:text-[#6f5b3e]">2</span>
-            <span className="px-2 py-1 cursor-pointer hover:text-[#6f5b3e]">3</span>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="mt-[18px] flex justify-center items-center gap-3 text-[0.8rem] text-[#8f8579]"
+          >
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <ChevronLeft size={16} className="cursor-pointer hover:text-[#6f5b3e]" />
+            </motion.div>
+            <motion.span 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-2 py-1 cursor-pointer bg-[#6f5b3e] rounded-md text-white font-semibold"
+            >
+              1
+            </motion.span>
+            <motion.span 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-2 py-1 cursor-pointer hover:text-[#6f5b3e]"
+            >
+              2
+            </motion.span>
+            <motion.span 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-2 py-1 cursor-pointer hover:text-[#6f5b3e]"
+            >
+              3
+            </motion.span>
             <span className="px-1">...</span>
-            <span className="px-2 py-1 cursor-pointer hover:text-[#6f5b3e]">10</span>
-            <ChevronRight size={16} className="cursor-pointer hover:text-[#6f5b3e]" />
-          </div>
-        </div>
-      </div>
+            <motion.span 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-2 py-1 cursor-pointer hover:text-[#6f5b3e]"
+            >
+              10
+            </motion.span>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <ChevronRight size={16} className="cursor-pointer hover:text-[#6f5b3e]" />
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
-      <TailorDetailSidebar 
-        isOpen={isSidebarOpen} 
-        onClose={handleCloseSidebar} 
-        tailor={selectedTailor} 
+      <TailorDetailSidebar
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        tailor={selectedTailor}
       />
-      
+
       <EditTailorModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         tailor={editingTailor}
         onSave={handleSaveTailor}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Tailor"
+        message={`Are you sure you want to delete ${deletingTailor?.name}? This action cannot be undone.`}
       />
     </motion.div>
   );

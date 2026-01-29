@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Phone, MapPin, Calendar, Users, ShoppingBag, TrendingUp, Award, ExternalLink, MessageSquare } from 'lucide-react';
+import { X, Mail, Phone, MapPin, Calendar, Users, ShoppingBag, DollarSign, Star, Clock, Award } from 'lucide-react';
 
 interface TailorDetailSidebarProps {
   isOpen: boolean;
@@ -18,167 +18,224 @@ interface TailorDetailSidebarProps {
   } | null;
 }
 
-// Animated Icon Wrapper Component
-const AnimatedIcon = ({ children, color = "#8a7b6a" }: { children: React.ReactNode, color?: string }) => (
-  <motion.div
-    whileHover={{ scale: 1.2, rotate: 5 }}
-    className="p-2 rounded-lg bg-white/50 shadow-sm flex items-center justify-center"
-    style={{ color }}
-  >
-    {children}
-  </motion.div>
-);
-
 const TailorDetailSidebar: React.FC<TailorDetailSidebarProps> = ({ isOpen, onClose, tailor }) => {
   if (!tailor) return null;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-500';
+      case 'pending': return 'bg-yellow-500';
+      default: return 'bg-red-500';
+    }
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with Blur */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/30 backdrop-blur-md z-[55]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[55]"
           />
 
-          {/* Premium Sidebar */}
+          {/* Sidebar */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-[#fcfaf7] z-[60] shadow-[-20px_0_50px_rgba(0,0,0,0.1)] flex flex-col border-l border-[#eaddcf]"
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-gradient-to-br from-[#fdfbf7] to-[#f5ede3] z-[60] shadow-[-10px_0_40px_rgba(0,0,0,0.1)] flex flex-col"
           >
-            {/* Custom Stitching Header */}
-            <div className="relative p-8 bg-[#8a7b6a] text-white overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 border-t-2 border-dashed border-white/30" />
-              <div className="relative z-10 flex justify-between items-center">
+            {/* Header */}
+            <div className="relative px-6 py-5 border-b border-[#e3dbd0] bg-white/50 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-serif font-bold tracking-tight">Tailor Profile</h2>
-                  <p className="text-white/70 text-sm italic">Mastering the Art of Fit</p>
+                  <h2 className="text-xl font-bold text-[#4a3f35]">Tailor Details</h2>
+                  <p className="text-xs text-[#8a7b6a] mt-0.5">Complete business information</p>
                 </div>
                 <motion.button
-                  whileHover={{ rotate: 90 }}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onClose}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  className="w-10 h-10 rounded-full bg-[#6f5b3e]/10 hover:bg-[#6f5b3e]/20 flex items-center justify-center text-[#6f5b3e] transition-colors"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </motion.button>
-              </div>
-              {/* Decorative SVG Pattern */}
-              <div className="absolute -right-4 -bottom-4 opacity-10">
-                <ShoppingBag size={120} />
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
 
-              {/* Profile Card with Animated Hover */}
+              {/* Profile Section */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-3xl p-6 shadow-[0_10px_30px_rgba(138,123,106,0.1)] border border-[#eaddcf] relative overflow-hidden group"
+                transition={{ delay: 0.1 }}
+                className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-[#e3dbd0]"
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#f8f5f2] rounded-bl-full -z-0 transition-all group-hover:scale-110" />
-
-                <div className="relative z-10 flex flex-col items-center">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="relative mb-4"
-                  >
-                    <img
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
                       src={tailor.img}
                       alt={tailor.name}
-                      className="w-28 h-28 rounded-2xl object-cover ring-4 ring-[#f8f5f2] shadow-xl"
+                      className="w-20 h-20 rounded-xl object-cover ring-4 ring-white shadow-lg"
                     />
-                    <div className={`absolute -bottom-2 -right-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white shadow-lg ${tailor.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500'}`}>
-                      {tailor.status}
-                    </div>
-                  </motion.div>
+                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 ${getStatusColor(tailor.status)} rounded-full border-2 border-white shadow-md`} />
+                  </div>
 
-                  <h3 className="text-2xl font-bold text-[#4a3f35]">{tailor.name}</h3>
-                  <div className="flex items-center gap-2 text-[#8a7b6a] mt-1">
-                    <span className="text-sm font-medium">Lead Designer: {tailor.owner}</span>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-[#4a3f35]">{tailor.name}</h3>
+                    <p className="text-sm text-[#8a7b6a] mt-0.5">Owner: {tailor.owner}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${tailor.status === 'active' ? 'bg-green-100 text-green-700' :
+                          tailor.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                        }`}>
+                        {tailor.status}
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-[#8a7b6a]">
+                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">4.8</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Stats Grid - Premium Cards */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Stats Grid */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="grid grid-cols-3 gap-3"
+              >
                 {[
-                  { icon: <Users size={18} />, label: 'Clients', value: tailor.customers, color: '#5d8a6a' },
-                  { icon: <ShoppingBag size={18} />, label: 'Orders', value: tailor.orders, color: '#b88924' }
+                  { icon: Users, label: 'Customers', value: tailor.customers, color: 'text-blue-600', bg: 'bg-blue-50' },
+                  { icon: ShoppingBag, label: 'Orders', value: tailor.orders, color: 'text-purple-600', bg: 'bg-purple-50' },
+                  { icon: DollarSign, label: 'Revenue', value: `₹${(tailor.revenue / 1000).toFixed(0)}K`, color: 'text-green-600', bg: 'bg-green-50' }
                 ].map((stat, i) => (
                   <motion.div
                     key={i}
-                    whileHover={{ y: -5 }}
-                    className="bg-white p-4 rounded-2xl border border-[#eaddcf] shadow-sm flex flex-col items-center"
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    className="bg-white rounded-xl p-4 shadow-sm border border-[#e3dbd0] hover:shadow-md transition-shadow"
                   >
-                    <AnimatedIcon color={stat.color}>{stat.icon}</AnimatedIcon>
-                    <span className="text-xs text-[#8a7b6a] mt-2 uppercase tracking-tighter font-bold">{stat.label}</span>
-                    <span className="text-xl font-bold text-[#4a3f35]">{stat.value}</span>
+                    <div className={`w-10 h-10 ${stat.bg} rounded-lg flex items-center justify-center mb-2`}>
+                      <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                    </div>
+                    <p className="text-xs text-[#8a7b6a] font-medium">{stat.label}</p>
+                    <p className="text-lg font-bold text-[#4a3f35] mt-0.5">{stat.value}</p>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
-              {/* Contact Section with "Stitched" border */}
-              <div className="bg-[#fcfaf7] border-2 border-dashed border-[#eaddcf] rounded-2xl p-5 space-y-4">
-                <h4 className="text-xs font-bold text-[#8a7b6a] uppercase tracking-[0.2em] mb-4">Registry Information</h4>
+              {/* Contact Information */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white rounded-2xl p-5 shadow-sm border border-[#e3dbd0]"
+              >
+                <h4 className="text-sm font-bold text-[#4a3f35] mb-4 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-[#6f5b3e] rounded-full" />
+                  Contact Information
+                </h4>
 
                 <div className="space-y-3">
                   {[
-                    { icon: <Phone size={16} />, text: '+91 98765-43210' },
-                    { icon: <Mail size={16} />, text: `${tailor.name.split(' ')[0].toLowerCase()}@atelier.com` },
-                    { icon: <MapPin size={16} />, text: `${tailor.city}, India` },
-                    { icon: <Calendar size={16} />, text: `Member since ${tailor.joined || '2023'}` }
+                    { icon: Phone, label: 'Phone', value: '+91 98765-43210' },
+                    { icon: Mail, label: 'Email', value: `${tailor.name.split(' ')[0].toLowerCase()}@tailor.com` },
+                    { icon: MapPin, label: 'Location', value: `${tailor.city}, India` },
+                    { icon: Calendar, label: 'Joined', value: tailor.joined || 'Jan 2024' }
                   ].map((item, idx) => (
                     <motion.div
                       key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + idx * 0.05 }}
                       whileHover={{ x: 5 }}
-                      className="flex items-center gap-3 text-sm text-[#5c5247]"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f8f5f2] transition-colors"
                     >
-                      <span className="text-[#8a7b6a]">{item.icon}</span>
-                      {item.text}
+                      <div className="w-8 h-8 bg-[#6f5b3e]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-4 h-4 text-[#6f5b3e]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#8a7b6a] font-medium">{item.label}</p>
+                        <p className="text-sm text-[#4a3f35] truncate">{item.value}</p>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Revenue Highlight */}
-              <div className="bg-[#4a3f35] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
-                <div className="relative z-10 flex justify-between items-center">
-                  <div>
-                    <p className="text-white/60 text-[10px] uppercase font-bold tracking-widest">Total Valuation</p>
-                    <h4 className="text-2xl font-bold">₹{tailor.revenue.toLocaleString()}</h4>
-                  </div>
-                  <TrendingUp className="text-emerald-400" size={32} />
+              {/* Business Metrics */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="bg-gradient-to-br from-[#6f5b3e] to-[#8a7b6a] rounded-2xl p-5 text-white shadow-lg"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <Award className="w-4 h-4" />
+                    Performance Metrics
+                  </h4>
+                  <Clock className="w-4 h-4 opacity-70" />
                 </div>
-                {/* Abstract Line Pattern */}
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              </div>
+
+                <div className="space-y-3">
+                  {[
+                    { label: 'Avg. Order Value', value: `₹${(tailor.revenue / tailor.orders).toFixed(0)}`, progress: 75 },
+                    { label: 'Customer Satisfaction', value: '4.8/5.0', progress: 96 },
+                    { label: 'Delivery Rate', value: '98%', progress: 98 }
+                  ].map((metric, idx) => (
+                    <div key={idx}>
+                      <div className="flex justify-between text-xs mb-1.5">
+                        <span className="opacity-90">{metric.label}</span>
+                        <span className="font-bold">{metric.value}</span>
+                      </div>
+                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${metric.progress}%` }}
+                          transition={{ delay: 0.6 + idx * 0.1, duration: 0.8 }}
+                          className="h-full bg-white rounded-full"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-1 gap-3 pt-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="grid grid-cols-2 gap-3 pt-2"
+              >
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full py-4 bg-[#8a7b6a] text-white rounded-xl font-bold shadow-xl shadow-[#8a7b6a]/20 flex items-center justify-center gap-2"
+                  className="py-3 px-4 bg-[#6f5b3e] text-white rounded-xl font-semibold text-sm shadow-lg shadow-[#6f5b3e]/30 hover:shadow-xl hover:shadow-[#6f5b3e]/40 transition-shadow"
                 >
-                  <ExternalLink size={18} /> View Portfolio
+                  View Profile
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.02, backgroundColor: '#fdfbf9' }}
+                  whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full py-4 border-2 border-[#8a7b6a] text-[#8a7b6a] rounded-xl font-bold flex items-center justify-center gap-2"
+                  className="py-3 px-4 bg-white border-2 border-[#6f5b3e] text-[#6f5b3e] rounded-xl font-semibold text-sm hover:bg-[#6f5b3e] hover:text-white transition-colors"
                 >
-                  <MessageSquare size={18} /> Contact Business
+                  Contact
                 </motion.button>
-              </div>
+              </motion.div>
+
             </div>
           </motion.div>
         </>

@@ -1,6 +1,6 @@
 import React from 'react'; import { StatCardProps, StatTitle } from '../types';
 
-export default function StatCard({ image, alt, style, subtitle, trend, trendDirection }: StatCardProps): React.JSX.Element {
+export default function StatCard({ image, alt, style, subtitle, trend, trendDirection, onClick }: StatCardProps): React.JSX.Element {
     const theme: Record<StatTitle, { color: string; softBg: string }> = {
         "Total Tailor Shops": { color: "#213c58ff", softBg: "rgba(59,110,165,0.18)" },
         "Active Tailors": { color: "#29431fff", softBg: "rgba(106,143,91,0.18)" },
@@ -71,8 +71,9 @@ export default function StatCard({ image, alt, style, subtitle, trend, trendDire
 
     return (
         <div
-            className="relative w-full rounded-[26px] overflow-hidden transition-all duration-500 select-none shadow-[0_6px_18px_rgba(0,0,0,0.18),0_2px_6px_rgba(0,0,0,0.12)] hover:-translate-y-[4px] hover:shadow-[0_12px_28px_rgba(0,0,0,0.28),0_8px_16px_rgba(0,0,0,0.18)] max-sm:rounded-[20px] group"
+            className="relative w-full h-full rounded-[26px] overflow-hidden transition-all duration-500 select-none shadow-[0_6px_18px_rgba(0,0,0,0.18),0_2px_6px_rgba(0,0,0,0.12)] hover:-translate-y-[4px] hover:shadow-[0_12px_28px_rgba(0,0,0,0.28),0_8px_16px_rgba(0,0,0,0.18)] max-sm:rounded-[20px] group cursor-pointer"
             style={style}
+            onClick={onClick}
         >
             <img
                 src={image}

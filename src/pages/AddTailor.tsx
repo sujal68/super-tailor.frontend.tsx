@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, Store, ArrowRight, X, Eye, EyeOff, RotateCcw } from 'lucide-react'; // Using Lucide for premium iconography
 import toast from 'react-hot-toast';
 import CustomDropdown from '../components/CustomDropdown';
+import CityDropdown from '../components/CityDropdown';
 
 interface TailorFormData {
   ownerName: string;
@@ -24,9 +25,11 @@ const AddTailor: React.FC = () => {
     password: '',
     shopName: '',
     shopAddress: '',
-    city: 'Mumbai',
+    city: '',
     status: 'Active',
   });
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,6 +43,7 @@ const AddTailor: React.FC = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) { toast('Please enter a valid email', { icon: '⚠️' }); return; }
     if (formData.mobile.length !== 10) { toast('Mobile number must be 10 digits', { icon: '⚠️' }); return; }
+    if (!formData.city.trim()) { toast('City is required', { icon: '⚠️' }); return; }
     if (formData.password.length < 8) { toast('Password too short', { icon: '⚠️' }); return; }
 
     toast.success('Tailor profile created successfully!');
@@ -54,7 +58,7 @@ const AddTailor: React.FC = () => {
       password: '',
       shopName: '',
       shopAddress: '',
-      city: 'Mumbai',
+      city: '',
       status: 'Active',
     });
     setShowPassword(false);
@@ -78,6 +82,17 @@ const AddTailor: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-6xl"
       >
+        {/* Header Outside Card */}
+        <div className="mb-6">
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl sm:text-2xl lg:text-3xl font-light text-[#6f5b3e] tracking-tight"
+          >
+            Partner <span className="font-semibold text-[#8b7a63]">Onboarding</span>
+          </motion.h1></div>
+
         <motion.div
           className="backdrop-blur-2xl bg-white/70 border-2 border-dashed border-[#6f5b3e]/25 rounded-2xl sm:rounded-[32px] overflow-visible relative"
           style={{
@@ -89,20 +104,18 @@ const AddTailor: React.FC = () => {
         >
           {/* Header Section Inside Card */}
           <div className="pt-4 sm:pt-6 pb-3 sm:pb-4 px-4 sm:px-6">
-            <motion.h1
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-xl sm:text-2xl lg:text-3xl font-light text-[#6f5b3e] tracking-tight"
-            >
-              Partner <span className="font-semibold text-[#8b7a63]">Onboarding</span>
-            </motion.h1>
+            
             <p className="text-[#8b7a63] mt-1 opacity-80 text-sm">Register a new premium tailor to the luxury network</p>
           </div>
 
           <form onSubmit={handleSubmit} className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 space-y-5 sm:space-y-6">
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 lg:gap-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 lg:gap-8"
+            >
 
               {/* Section: Owner Details */}
               <section className="space-y-4">
@@ -210,16 +223,11 @@ const AddTailor: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className={labelStyles}>Location</label>
-                      <CustomDropdown
-                        options={[
-                          { value: 'Mumbai', label: 'Mumbai' },
-                          { value: 'Delhi', label: 'Delhi' },
-                          { value: 'Surat', label: 'Surat' },
-                          { value: 'Bangalore', label: 'Bangalore' },
-                        ]}
+                      <CityDropdown
                         value={formData.city}
                         onChange={(value) => setFormData({ ...formData, city: value })}
                         placeholder="Select City"
+                        searchable={true}
                       />
                     </div>
                     <div>
@@ -238,7 +246,7 @@ const AddTailor: React.FC = () => {
                   </div>
                 </div>
               </section>
-            </div>
+            </motion.div>
 
             {/* Footer Actions */}
             <div className="pt-4 sm:pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-t border-[#e8dfd5]">

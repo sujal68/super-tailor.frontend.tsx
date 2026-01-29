@@ -46,6 +46,7 @@ export interface StatCardProps {
   subtitle?: string;
   trend?: string;
   trendDirection?: 'up' | 'down' | 'stable';
+  onClick?: () => void;
 }
 
 export interface GlobalFiltersProps {

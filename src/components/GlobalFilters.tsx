@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GlobalFiltersProps, PremiumSelectProps } from '../types';
+import { getCityOptions } from '../utils/cities';
+import CityDropdown from './CityDropdown';
 
 export default function GlobalFilters({ filters, setFilters }: GlobalFiltersProps): React.JSX.Element {
     return (
@@ -36,12 +38,7 @@ export default function GlobalFilters({ filters, setFilters }: GlobalFiltersProp
                         icon={<LocationIcon />}
                         value={filters.city}
                         onChange={(v: string) => setFilters({ ...filters, city: v })}
-                        options={[
-                            { value: "all", label: "All" },
-                            { value: "surat", label: "Surat" },
-                            { value: "ahmedabad", label: "Ahmedabad" },
-                            { value: "vadodara", label: "Vadodara" },
-                        ]}
+                        options={getCityOptions().slice(0, 10)} // Show top 10 cities for mobile
                     />
                     <MobileFilter
                         label="Status"
@@ -60,50 +57,68 @@ export default function GlobalFilters({ filters, setFilters }: GlobalFiltersProp
 
             {/* Desktop: Original layout */}
             <div className="hidden lg:flex flex-wrap md:flex-nowrap gap-[18px] min-[1300px]:gap-[18px] gap-[12px] p-[14px_18px] min-[1300px]:p-[14px_18px] p-[10px_12px] rounded-[16px] bg-[linear-gradient(180deg,#ffffff9a_0%,#ffffff4f_100%)] border border-[#e3dbd0]">
-                <PremiumSelect
-                    label="Date Range"
-                    value={filters.dateRange}
-                    onChange={(v: string) => setFilters({ ...filters, dateRange: v })}
-                    options={[
-                        { value: "7", label: "Last 7 Days" },
-                        { value: "30", label: "Last 30 Days" },
-                        { value: "90", label: "Last 3 Months" },
-                        { value: "365", label: "Last Year" },
-                    ]}
-                />
-                <PremiumSelect
-                    label="Tailor Business"
-                    value={filters.business}
-                    onChange={(v: string) => setFilters({ ...filters, business: v })}
-                    options={[
-                        { value: "all", label: "All" },
-                        { value: "royal", label: "Royal Tailors" },
-                        { value: "elite", label: "Elite Stitch" },
-                        { value: "urban", label: "Urban Fit" },
-                    ]}
-                />
-                <PremiumSelect
-                    label="City"
-                    value={filters.city}
-                    onChange={(v: string) => setFilters({ ...filters, city: v })}
-                    options={[
-                        { value: "all", label: "All" },
-                        { value: "surat", label: "Surat" },
-                        { value: "ahmedabad", label: "Ahmedabad" },
-                        { value: "vadodara", label: "Vadodara" },
-                    ]}
-                />
-                <PremiumSelect
-                    label="Status"
-                    value={filters.status}
-                    onChange={(v: string) => setFilters({ ...filters, status: v })}
-                    options={[
-                        { value: "all", label: "All" },
-                        { value: "active", label: "Active" },
-                        { value: "suspended", label: "Suspended" },
-                        { value: "trial", label: "Trial" },
-                    ]}
-                />
+                <div className="flex flex-col gap-[6px] min-[1300px]:gap-[6px] gap-[4px]">
+                    <label className="text-[12px] min-[1300px]:text-[12px] text-[10px] text-[#8f8579] font-medium font-[Inter]">Date Range</label>
+                    <CityDropdown
+                        value={filters.dateRange}
+                        onChange={(v: string) => setFilters({ ...filters, dateRange: v })}
+                        placeholder="Last 30 Days"
+                        searchable={false}
+                        includeAll={false}
+                        className="min-w-[150px] min-[1300px]:min-w-[150px] min-w-[120px]"
+                        customOptions={[
+                            { value: "7", label: "Last 7 Days" },
+                            { value: "30", label: "Last 30 Days" },
+                            { value: "90", label: "Last 3 Months" },
+                            { value: "365", label: "Last Year" },
+                        ]}
+                    />
+                </div>
+                <div className="flex flex-col gap-[6px] min-[1300px]:gap-[6px] gap-[4px]">
+                    <label className="text-[12px] min-[1300px]:text-[12px] text-[10px] text-[#8f8579] font-medium font-[Inter]">Tailor Business</label>
+                    <CityDropdown
+                        value={filters.business}
+                        onChange={(v: string) => setFilters({ ...filters, business: v })}
+                        placeholder="All"
+                        searchable={false}
+                        includeAll={false}
+                        className="min-w-[150px] min-[1300px]:min-w-[150px] min-w-[120px]"
+                        customOptions={[
+                            { value: "all", label: "All" },
+                            { value: "royal", label: "Royal Tailors" },
+                            { value: "elite", label: "Elite Stitch" },
+                            { value: "urban", label: "Urban Fit" },
+                        ]}
+                    />
+                </div>
+                <div className="flex flex-col gap-[6px] min-[1300px]:gap-[6px] gap-[4px]">
+                    <label className="text-[12px] min-[1300px]:text-[12px] text-[10px] text-[#8f8579] font-medium font-[Inter]">City</label>
+                    <CityDropdown
+                        value={filters.city}
+                        onChange={(v: string) => setFilters({ ...filters, city: v })}
+                        placeholder="All Cities"
+                        searchable={true}
+                        includeAll={true}
+                        className="min-w-[150px] min-[1300px]:min-w-[150px] min-w-[120px]"
+                    />
+                </div>
+                <div className="flex flex-col gap-[6px] min-[1300px]:gap-[6px] gap-[4px]">
+                    <label className="text-[12px] min-[1300px]:text-[12px] text-[10px] text-[#8f8579] font-medium font-[Inter]">Status</label>
+                    <CityDropdown
+                        value={filters.status}
+                        onChange={(v: string) => setFilters({ ...filters, status: v })}
+                        placeholder="All"
+                        searchable={false}
+                        includeAll={false}
+                        className="min-w-[150px] min-[1300px]:min-w-[150px] min-w-[120px]"
+                        customOptions={[
+                            { value: "all", label: "All" },
+                            { value: "active", label: "Active" },
+                            { value: "suspended", label: "Suspended" },
+                            { value: "trial", label: "Trial" },
+                        ]}
+                    />
+                </div>
             </div>
         </>
     );
@@ -173,14 +188,16 @@ function MobileFilter({ label, icon, value, onChange, options }: PremiumSelectPr
 
 }
 
-function PremiumSelect({ label, value, onChange, options }: PremiumSelectProps): React.JSX.Element {
+function PremiumSelect({ label, value, onChange, options, searchable }: PremiumSelectProps & { searchable?: boolean }): React.JSX.Element {
     const [open, setOpen] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const close = (e: MouseEvent): void => {
             if (!ref.current?.contains(e.target as Node)) {
                 setOpen(false);
+                setSearchTerm("");
             }
         };
         document.addEventListener("mousedown", close);
@@ -188,6 +205,9 @@ function PremiumSelect({ label, value, onChange, options }: PremiumSelectProps):
     }, []);
 
     const selected = options.find(o => o.value === value)?.label;
+    const filteredOptions = searchable && searchTerm 
+        ? options.filter(opt => opt.label.toLowerCase().includes(searchTerm.toLowerCase()))
+        : options;
 
     return (
         <div ref={ref} className="relative flex flex-col gap-[6px] min-[1300px]:gap-[6px] gap-[4px]">
@@ -202,11 +222,23 @@ function PremiumSelect({ label, value, onChange, options }: PremiumSelectProps):
             </div>
 
             {open && (
-                <div className="absolute top-[110%] left-0 right-0 rounded-[14px] p-[6px] bg-[rgb(255_255_255_/38%)] backdrop-blur-[18px] border border-[rgba(255,255,255,0.4)] shadow-[0_25px_60px_rgba(0,0,0,0.25)] overflow-hidden z-[100] font-[Inter]">
-                    {options.map(opt => (
+                <div className="absolute top-[110%] left-0 right-0 rounded-[14px] p-[6px] bg-[rgb(255_255_255_/38%)] backdrop-blur-[18px] border border-[rgba(255,255,255,0.4)] shadow-[0_25px_60px_rgba(0,0,0,0.25)] overflow-hidden z-[100] font-[Inter] max-h-[200px] overflow-y-auto">
+                    {searchable && (
+                        <div className="p-2 border-b border-[rgba(255,255,255,0.3)]">
+                            <input
+                                type="text"
+                                placeholder="Search cities..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full px-3 py-2 text-[12px] bg-white/70 border border-[rgba(255,255,255,0.5)] rounded-[8px] focus:outline-none focus:bg-white"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </div>
+                    )}
+                    {filteredOptions.map(opt => (
                         <div
                             key={opt.value}
-                            onClick={() => { onChange(opt.value); setOpen(false); }}
+                            onClick={() => { onChange(opt.value); setOpen(false); setSearchTerm(""); }}
                             className={`px-[14px] py-[10px] text-[13px] rounded-[10px] cursor-pointer text-[#5d4a3b] transition-all duration-[250ms] select-none ${opt.value === value ? "bg-[rgba(255,255,255,0.45)]" : "hover:bg-[rgba(255,255,255,0.55)]"}`}
                         >
                             {opt.label}

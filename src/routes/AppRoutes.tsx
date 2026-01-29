@@ -8,13 +8,15 @@ import Login from "../pages/Login";
 import ForgotPassword from "../pages/ForgotPassword";
 import AddTailor from "../pages/AddTailor";
 import AllTailors from "../pages/AllTailors";
+import AddAdmin from "../pages/AddAdmin";
+import AllAdmins from "../pages/AllAdmins";
 
 import Dashboard from "../pages/Dashboard";
 import Customers from "../pages/Customers";
 import Admins from "../pages/Admins";
 import Reports from "../pages/Reports";
 import Settings from "../pages/Settings";
-import Measurements from "../pages/Measurements";
+import Invoices from "../pages/Invoices";
 import RecentRegistrations from "../pages/RecentRegistrations";
 import AdminLayout from "../layouts/AdminLayout";
 import Profile from "../pages/Profile";
@@ -72,16 +74,15 @@ export default function AppRoutes({ onTriggerLoader, onLoaderComplete }: AppRout
                 <Route path="customers" element={<Customers />} />
                 <Route path="add-tailor" element={<AddTailor />} />
                 <Route path="all-tailors" element={<AllTailors />} />
+                <Route path="add-admin" element={<AddAdmin />} />
+                <Route path="all-admins" element={<AllAdmins />} />
                 <Route path="admins" element={<Admins />} />
                 <Route path="recent-registrations" element={<RecentRegistrations />} />
-                <Route path="invoices" element={<Measurements />} />
+                <Route path="invoices" element={<Invoices />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="profile" element={<Profile />} />
             </Route>
-
-
-            {/* profile page */}
-            <Route path="/profile" element={<Profile />} />
 
 
         </Routes>

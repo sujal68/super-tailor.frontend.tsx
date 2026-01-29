@@ -32,7 +32,7 @@ export default function AdminLayout(): React.JSX.Element {
 
                 <div className="flex-1 transition-all duration-500 ease-in-out min-w-0 relative flex flex-col">
                     <Header setSidebarOpen={setSidebarOpen} />
-                    <main className="flex-1 overflow-x-hidden">
+                    <main className="flex-1">
                         <Outlet />
                     </main>
                 </div>

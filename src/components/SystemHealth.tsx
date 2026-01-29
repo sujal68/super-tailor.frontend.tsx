@@ -15,7 +15,7 @@ const StatRow: React.FC<StatRowProps> = ({ label, value }) => (
 export default function SystemHealth(): React.JSX.Element {
     return (
         <div className="w-full bg-gradient-to-b from-white/55 to-white/35 rounded-[20px] sm:rounded-[26px] pt-2.5 px-4 sm:px-6 pb-5 sm:pb-6 mt-5 shadow-[0_20px_40px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.6)] border border-white/35 font-['Poppins',sans-serif] h-[300px] sm:h-[300px] relative flex flex-col">
-            
+
             {/* Header */}
             <div className="flex justify-between items-center mb-4 sm:mb-5">
                 <h3 className="text-[16px] sm:text-[18px] font-semibold text-[#6f5b3e] pt-2">
